@@ -175,6 +175,16 @@ int main() {
                 return false;
             }
         }),
+        test("Stringify Tests", [&]() {
+            t2.val() = 42;
+            t2.test().test() = 31;
+            t2.test().test2() = "18/02/99";
+            string expected = "{\"test\": {\"test\": 31, \"test2\": \"18/02/99\"}, \"val\": 42}",
+                get = t2.stringify();
+            cout << "expect: " << expected << '\n';
+            cout << "have: " << get << '\n';
+            return get == expected;
+        }),
         test("end")
     };
 

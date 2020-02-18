@@ -35,11 +35,15 @@ public:
 };
 
 class Json {
+
+template<typename T1, typename T2>
+using jmap = std::map<T1, T2>;
+
 protected:
-    std::map<std::string, std::pair<std::string, void*>> _json_map;
-    static std::map<std::string, std::function<void(void *, std::string)>> _json_assign;
-    static std::map<std::string, std::function<void(void *, void *)>> _json_operator_eq;
-    static std::map<std::string, std::function<jstring(void *)>> _json_stringify;
+    jmap<std::string, std::pair<std::string, void*>> _json_map;
+    static jmap<std::string, std::function<void(void *, std::string)>> _json_assign;
+    static jmap<std::string, std::function<void(void *, void *)>> _json_operator_eq;
+    static jmap<std::string, std::function<jstring(void *)>> _json_stringify;
 
     template<typename T>
     T _JsnVar(std::string name, T *var, T val = T()) {
