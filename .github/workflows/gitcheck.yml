@@ -13,7 +13,7 @@ jobs:
       run: mkdir build
     - name: cmake
       run: cd build && cmake ..
-    - name: cd build && make check
-      run: make check
+    - name: cmake check
+      run: cd build && cmake check
    # - name: make distcheck
     #  run: make distcheck
