@@ -7,6 +7,8 @@
 
 using namespace std;
 
+static int RES_TEST = 0;
+
 function<void(int)> test(string name, function<bool(void)> f) {
     struct results {
         int succed;
@@ -19,6 +21,7 @@ function<void(int)> test(string name, function<bool(void)> f) {
             << score->succed + score->failed << " test(s) done !\n"
             << score->succed << " test(s) SUCCED !\n"
             << score->failed << " test(s) FAILED :(\n";
+            RES_TEST = score->failed;
             delete score;
         };
     }
@@ -79,6 +82,8 @@ public:
 int main() {
     Test t;
     TestObj t2;
+
+
 
     vector<function<void(int)>> tests = {
         test("Base Tests", [&](){
@@ -177,5 +182,5 @@ int main() {
         auto& test = tests[i];
         test(i);
     }
-    return 0;
+    return RES_TEST;
 }
