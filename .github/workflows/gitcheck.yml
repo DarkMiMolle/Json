@@ -12,8 +12,8 @@ jobs:
     - name: set up
       run: mkdir build
     - name: cmake
-      run: cd build && cmake ..
-    - name: cmake check
-      run: cd build && cmake check
+      run: cd build && cmake .. && make
+    - name: make check
+      run: cd build && make check
    # - name: make distcheck
     #  run: make distcheck
