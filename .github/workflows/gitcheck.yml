@@ -13,7 +13,7 @@ jobs:
       run: mkdir build
     - name: cmake
       run: cd build && cmake .. && make
-    - name: make check
-      run: cd build && make check
+    - name: test
+      run: cd build/test && ./JsonTest
    # - name: make distcheck
     #  run: make distcheck
