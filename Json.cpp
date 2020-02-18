@@ -229,3 +229,66 @@ void Json::load(jstring jsn) {
   }
 }
 
+map<string, function<jstring(void *)>> Json::_json_stringify = {
+  { // char
+      string(typeid(char).name()), 
+      [](void *val) {
+        char& var = *(char *)val;
+        return string("\"") + var + "\"";
+      }
+    },
+    { // int
+      string(typeid(int).name()),
+      [](void *val) {
+        int& var = *(int *)val;
+        return to_string(var);
+      }
+    },
+    { // bool
+      string(typeid(bool).name()),
+      [](void * val) {
+        bool& var = *(bool *)val;
+        return var ? "true" : "false";
+      }
+    },
+    { // string
+      string(typeid(string).name()),
+      [](void *val) {
+        string& var = *(string *)val;
+        return "\"" + var + "\"";
+      }
+    },
+    { // float
+      string(typeid(float).name()),
+      [](void *val) {
+        float& var = *(float *)val;
+        return to_string(var);
+      }
+    },
+    { // Object
+      "Object",
+      [](void *val) {
+        Json& obj = *(Json *)val;
+        return obj.stringify();
+      }
+    },
+    { // Array
+      "Array",
+      [](void *val) {
+        JsonArray& var = *(JsonArray *)val;
+        return var.stringify();
+      }
+    }
+};
+
+jstring Json::stringify(short flags) const {
+  //TODO action on flags
+  string jsn{"{"};
+  for (auto& [name, pair] : _json_map) {
+    jsn += "\"" + name + "\": " + _json_stringify.at(pair.first)(pair.second) + ", ";
+  }
+  jsn.pop_back();
+  jsn.back() = '}';
+  return jsn;
+}
+

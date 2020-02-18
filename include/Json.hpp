@@ -15,12 +15,14 @@ protected:
     static std::vector<jstring> jsonArrayParse(jstring jsn);
 public:
     virtual void load(jstring jsnArray) = 0;
+    virtual jstring stringify() const = 0;
 };
 
 template<typename T>
 class JVector : public JsonArray, public std::vector<T> {
 public:
     void load(jstring jsnArray) override;
+    jstring stringify() const override;
     operator std::vector<T>& () { return *this; }
 };
 
@@ -28,6 +30,7 @@ template<typename T, size_t N>
 class JArray : public JsonArray, public std::array<T, N> {
 public:
     void load(jstring jsnArray) override;
+    jstring stringify() const override;
     operator std::array<T, N>& () { return *this; }
 };
 
@@ -36,6 +39,7 @@ protected:
     std::map<std::string, std::pair<std::string, void*>> _json_map;
     static std::map<std::string, std::function<void(void *, std::string)>> _json_assign;
     static std::map<std::string, std::function<void(void *, void *)>> _json_operator_eq;
+    static std::map<std::string, std::function<jstring(void *)>> _json_stringify;
 
     template<typename T>
     T _JsnVar(std::string name, T *var, T val = T()) {
@@ -82,9 +86,17 @@ public:
         return nullptr;
     }
 
-    jstring stringify(short flags = 0) const {
-        return "TODO";
+    template<typename T>
+    static jstring serialize(const T val) {
+        if constexpr (std::is_base_of_v<Json, T> || std::is_base_of_v<JsonArray, T>) {
+            return val.stringify();
+        } else if (_json_assign.count(typeid(T).name())) {
+            return _json_stringify.at(typeid(T).name())((void *)(&val));
+        }
+        // ERROR
+        return "";
     }
+    jstring stringify(short flags = 0) const;
 };
 
 #define VARNAME(name) m_##name
@@ -111,6 +123,17 @@ void JVector<T>::load(jstring jsnArray) {
     }
 }
 
+template<typename T>
+jstring JVector<T>::stringify() const {
+    std::string jsn{"["};
+    for (auto& elem : *this) {
+        jsn += Json::serialize(elem) + ", ";
+    }
+    jsn.pop_back();
+    jsn.back() = ']';
+    return jsn;
+}
+
 template<typename T, size_t N>
 void JArray<T, N>::load(jstring jsnArray) {
     auto vals = jsonArrayParse(jsnArray);
@@ -119,4 +142,15 @@ void JArray<T, N>::load(jstring jsnArray) {
         (*this)[i] = *ptr;
         delete ptr;
     }
+}
+
+template<typename T, size_t N>
+jstring JArray<T, N>::stringify() const {
+    std::string jsn{"["};
+    for (auto& elem : *this) {
+        jsn += Json::serialize(elem) + ", ";
+    }
+    jsn.pop_back();
+    jsn.back() = ']';
+    return jsn;
 }
