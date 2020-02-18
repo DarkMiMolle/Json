@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 #include <any>
+#include <cassert>
 
 using jstring = std::string;
 
