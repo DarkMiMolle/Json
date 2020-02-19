@@ -79,6 +79,23 @@ public:
     Test& test() { return m_test; }
 };
 
+class Example: public Json {
+private:
+  JVar(val, int);
+  JVarVal(str, string, "Hello world !");
+public:
+  Example() = default;
+  Example(const Example& copy) {
+    Json::operator=(copy);
+  }
+};
+
+class Exp2: public Json {
+private:
+  JVar(array, JVector);
+  JVar(obj, Example);
+};
+
 int main() {
     Test t;
     TestObj t2;
@@ -147,9 +164,9 @@ int main() {
         }),
         test("Array Tests", [&]() {
             string json = "[42, 23]";
-            cout << "try to creat a JVector with: '" << json << "'\n";
+            cout << "try to create a JVector with: '" << json << "'\n";
             try {
-                auto* tab = Json::creat<JVector<int>>(json);
+                auto* tab = Json::create<JVector<int>>(json);
                 vector<int> expected = {42, 23};
                 auto get = *tab;
                 delete tab;
@@ -164,7 +181,7 @@ int main() {
             string json = "[23, 04, 99]";
             cout << "create JArray<int, 3> with '" << json << "'\n";
             try {
-                auto* tab = Json::creat<JArray<int, 3>>(json);
+                auto* tab = Json::create<JArray<int, 3>>(json);
                 array<int, 3> expected = {23, 04, 99};
                 auto get = *tab;
                 delete tab;

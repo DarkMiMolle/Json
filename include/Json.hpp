@@ -60,6 +60,8 @@ protected:
     }
 
 public:
+    Json() = default;
+
     virtual void load(jstring jsn) final;
     virtual Json& operator = (const Json& assign) {
         for (auto& [name, pair] : _json_map) {
@@ -75,7 +77,7 @@ public:
     }
 
     template<typename T>
-    static T* creat(jstring jsn) {
+    static T* create(jstring jsn) {
         // TODO return my safe_ptr
         T* ptr_val = new T;
         T& val = *ptr_val;
@@ -121,7 +123,7 @@ template<typename T>
 void JVector<T>::load(jstring jsnArray) {
     auto vals = jsonArrayParse(jsnArray);
     for (auto& jval : vals) {
-        auto* ptr = Json::creat<T>(jval);
+        auto* ptr = Json::create<T>(jval);
         this->push_back(*ptr);
         delete ptr;
     }
@@ -142,7 +144,7 @@ template<typename T, size_t N>
 void JArray<T, N>::load(jstring jsnArray) {
     auto vals = jsonArrayParse(jsnArray);
     for (size_t i = 0; i < N && i < vals.size(); ++i) {
-        auto *ptr = Json::creat<T>(vals[i]);
+        auto *ptr = Json::create<T>(vals[i]);
         (*this)[i] = *ptr;
         delete ptr;
     }

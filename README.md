@@ -69,7 +69,7 @@ using namespace std;
 class Example: public Json {
 private:
   JVar(val, int);
-  JVarVal(str, string);
+  JVarVal(str, string, "Hello world !");
 public:
   Example() = default;
   Example(const Example& copy) {
@@ -85,11 +85,33 @@ private:
 
 int main() {
   Example exp1;
-  exp1.load("{\"val\": 42, \"str\": \"hello world !\"}");
-  // exp1 = {"val": 42, "str": "hello world !"}
+  exp1.load("{\"val\": 42}");
+  // exp1 = {"val": 42, "str": "Hello world !"}
   Exp2 exp2;
-  exp2.load(string() + "{\"obj\": " + exp1.stringify() + "}");
-  // exp2 = {"array": [], "obj": {"val": 42, "str": "hello world !"}}
+  JArray<int, 3> tab{31, 08, 99};
+  exp2.load("\array\": " + Json::serialize(tab) + "{\"obj\": " + exp1.stringify() + "}");
+  // exp2 = {"array": [31, 08, 99], "obj": {"val": 42, "str": "Hello world !"}}
 }
 ```
+
+---
+
+`class Json`: inherits from that class make your class Jsonable.
+
+| methods                                    | parameters and return info                                   | description                                                  |
+| :----------------------------------------- | :----------------------------------------------------------- | ------------------------------------------------------------ |
+| `virtual jstring stringify() const`        | • return: a valide Json string                               | return the Json string of the current object.                |
+| `virtual void load(jstring jsn)`           | • `jstring jsn`: a string wich represent a Json.             | load jsn in the current obj or throw an error.               |
+| `static T* create<T>(jstring jsn)`         | • `T` the type to create (must be Jsonable)<br />• `jstring jsn`: a string wich represent a Json.<br />• return: a new pointer T | Try to create a new T object where we load jsn.<br />On failure, return `nullptr`. |
+| `static jstring serialize<T>(const T val)` | • `T` the type to serialize (must be Jsonable)<br />• return: a valide Json string<br />• `T val`: the val to serialize | return the jstring made by val                               |
+
+Jsonable type are the following:
+
+- `bool`
+- `char`
+- `int`
+- `float`
+- `string`
+- `Json` (`JsonAny` and evry inherit class from `Json`) TODO: JsonAny
+- `JsonArray` (`JVector`, `JArray`, and evry inherit class from `JsonArray`)
 
