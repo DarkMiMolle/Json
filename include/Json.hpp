@@ -111,7 +111,7 @@ public:
 
 #define JVar(name, type) _JVAR(name, type))
 
-#define JVarVal(name, type, val) _JVAR(name, type), val)
+#define JVarVal(name, type, val) _JVAR(name, type), type(val))
 
 #define JCtorDefault(type) type () = default;\
 type (const type & cpy) { Json::operator=(cpy); }\

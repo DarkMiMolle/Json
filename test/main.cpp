@@ -92,7 +92,7 @@ public:
 
 class Exp2: public Json {
 private:
-  JVar(array, JVector);
+  JVar(array, JVector<int>);
   JVar(obj, Example);
 };
 
