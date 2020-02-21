@@ -283,6 +283,9 @@ map<string, function<jstring(void *)>> Json::_json_stringify = {
 
 jstring Json::stringify(short flags) const {
   //TODO action on flags
+  if (_json_map.empty()) {
+    return "no object";
+  }
   string jsn{"{"};
   for (auto& [name, pair] : _json_map) {
     jsn += "\"" + name + "\": " + _json_stringify.at(pair.first)(pair.second) + ", ";

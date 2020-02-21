@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(JsonTest)
 
-add_executable(JsonTest main.cpp ../../Json.cpp ../../include/Json.hpp)
+add_executable(JsonTest main.cpp ../../Json.cpp ../../JsnAny.cpp ../../include/Json.hpp)

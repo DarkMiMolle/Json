@@ -4,6 +4,7 @@
 #include <iostream>
 #include <type_traits>
 #include <exception>
+#include <any>
 
 using namespace std;
 
@@ -75,6 +76,14 @@ private:
     JVar(val, int);
     JVar(test, Test);
 public:
+    TestObj() = default;
+    TestObj(const TestObj& t) {
+        Json::operator=(t);
+    }
+    TestObj(const TestObj&& t) {
+        Json::operator=(t);
+    }
+
     int& val() { return m_val; }
     Test& test() { return m_test; }
 };
@@ -99,7 +108,6 @@ private:
 int main() {
     Test t;
     TestObj t2;
-
 
 
     vector<function<void(int)>> tests = {
@@ -202,6 +210,27 @@ int main() {
             cout << "have: " << get << '\n';
             return get == expected;
         }),
+        test("Json Any Tests", [&]() {
+            JsnAny j(t);
+            bool res = true;
+            cout << "init with an Object (Json)\n";
+            res = res && (j.stringify() == t.stringify());
+            cout << "excpect: " << t.stringify() << '\n'
+            << "get: " << j.stringify() << '\n';
+            if (!res) return res;
+            cout << "assign an int\n";
+            j = 42;
+            res = res && j.as<int>() == 42;
+            cout << "expect: 42\nget: ";
+            cout << j.as<int>() << '\n';
+            if (!res) return res;
+            cout << "assign an Array\n";
+            cout << "assign an(other) Object (Json)\n";
+            j = t2;
+            cout << "expect: " << t2.stringify() << "\nget: ";
+            cout << j.stringify() << '\n';
+            return res && j.stringify() == t2.stringify();
+        }),
         test("end")
     };
 
@@ -211,3 +240,64 @@ int main() {
     }
     return RES_TEST;
 }
+/*
+class MyAny {
+private:
+    string _type = "";
+    void* _val = nullptr;
+    string* _str_val = nullptr;
+public:
+    MyAny() = default;
+    template<typename T>
+    MyAny(T val) {
+        _type = typeid(T).name();
+        _val = new T(val);
+    }
+
+
+    // MyAny& operator=(string val) {
+    //     free(_val);
+    //     _type = typeid(string).name();
+    //     _val = new string(val);
+    //     return *this;
+    // }
+
+    template<typename T>
+    MyAny& operator=(T val) {
+        free(_val);
+        _type = typeid(T).name();
+        _val = new T(val);
+        return *this;
+    }
+
+    template<typename T>
+    bool is() {
+        return typeid(T).name() == _type;
+    }
+
+    template<typename T>
+    T& as() {
+        if (typeid(T).name() == _type) return *static_cast<T *>(_val);
+        else if constexpr (is_same_v<T, string>) {
+            if (typeid(const char *).name() == _type) {
+                _str_val = new string;
+                *_str_val = *(const char **)_val;
+                // cout << "str_val ?: " << *_str_val << '\n';
+                // cout << "_val ? : " << (const char *)_val << '\n';
+                return *_str_val;
+            }
+        }
+        throw "invalide type";
+    }
+
+    template<typename T>
+    T& force_cast() {
+        return *(T *)_val;
+    }
+
+    template<typename T>
+    operator T& () {
+        return as<T>();
+    }
+};
+*/
